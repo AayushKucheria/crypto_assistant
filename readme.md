@@ -22,14 +22,14 @@ This project implements an AI-powered assistant that processes natural language 
 
 ## Installation
 
-1. Clone this repository: git clone [https://github.com/yourusername/crypto-assistant.git](https://github.com/yourusername/crypto-assistant.git)
-   cd crypto-assistant
-2. Install the required dependencies: pip install openai
-3. Set up your OpenAI API key as an environment variable: export OPENAI_API_KEY='your-api-key-here'
+1. Clone this repository: `git clone https://github.com/yourusername/crypto-assistant.git`
+   `cd crypto-assistant`
+2. Install the required dependencies: `pip install openai`
+3. Set up your OpenAI API key as an environment variable: `export OPENAI_API_KEY='your-api-key-here'`
 
 ## Usage
 
-Run the main script: python crypto_assistant.py
+Run the main script: `python crypto_assistant.py`
 
 The assistant will prompt you for input. You can enter natural language commands like:
 
@@ -56,30 +56,25 @@ Type 'help' or '?' for more information about supported operations.
 To add new actions or protocols:
 
 1. Update the `SUPPORTED_ACTIONS`, `SUPPORTED_PROTOCOLS`, and `SUPPORTED_CHAINS` constants.
-2. Add new validation functions in the `validate_command` function.
-3. Create new processing functions (e.g., `process_new_action`) for the new actions.
-4. Update the `tools` list with new function definitions for the AI model.
-5. Modify the `process_ai_response` function to handle the new actions.
+2. If action, add new validation and processing functions.
+3. Update the `tools` list with new function definitions for the AI model.
+4. Update the `help` and `system message` with the new additions.
 
-## Error Handling
+## Error Handling and Security
 
-The assistant provides informative error messages for:
-
-- Unsupported actions, protocols, or chains
-- Invalid token amounts
-- General processing errors
+- The assistant uses AI-generated responses for user-friendly error messages and guidance.
+- Backend functions implement strict validation to prevent unauthorized or invalid operations, overriding AI decisions if necessary.
+- This dual approach allows for a flexible user experience while maintaining robust security measures.
 
 ## Future Enhancements
 
-- Implement a recommendation system based on user portfolio
-- Add support for more DeFi protocols and chains
-- Integrate with real-time price feeds for token conversions
-- Implement multi-step operations (e.g., swap then bridge)
-
+- Add support for multi-step conversations and operations (e.g., swap then bridge)
+- Expand supported protocols and chains
+- Implement more sophisticated portfolio analysis and action suggestion.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License.
 
 ## Disclaimer
 

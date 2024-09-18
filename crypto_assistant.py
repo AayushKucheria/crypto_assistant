@@ -1,4 +1,5 @@
 import openai
+from openai import OpenAI
 import json
 from decimal import Decimal, InvalidOperation
 import os
@@ -12,7 +13,7 @@ MAX_TOKEN_AMOUNT = Decimal('1000000')  # 1 million tokens
 MIN_TOKEN_AMOUNT = Decimal('0.000001')  # 1 millionth of a token
 
 # OpenAI client initialization
-client = openai.OpenAI(api_key=API_KEY)
+client = OpenAI(api_key=API_KEY)
 
 HELP_TEXT = """
     Supported Actions:
@@ -129,7 +130,7 @@ def get_ai_response(input_text: str) -> openai.types.chat.ChatCompletion:
         {"role": "user", "content": input_text}
     ]
     return client.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-4o-mini",
         messages=messages,
         tools=tools,
         tool_choice="auto"
@@ -194,7 +195,7 @@ def process_ai_response(response: openai.types.chat.ChatCompletion) -> tuple[dic
 
 def process_nl_input(input_text: str) -> tuple[dict | None, str | None]:
     """Process natural language input and return structured output or guidance."""
-    
+
     if input_text.lower() in ['help', '?']:
         return None, HELP_TEXT
     try:
