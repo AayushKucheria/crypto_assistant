@@ -38,6 +38,8 @@ The assistant will prompt you for input. You can enter natural language commands
 
 Type 'help' or '?' for more information about supported operations.
 
+For testing, `python -u unittest test.py`
+
 ## Supported Operations
 
 1. Swap tokens
