@@ -71,6 +71,12 @@ To add new actions or protocols:
 - Add support for multi-step conversations and operations (e.g., swap then bridge)
 - Expand supported protocols and chains
 - Implement more sophisticated portfolio analysis and action suggestion.
+  - A basic system would include a set of heuristics that would periodically be measured against user data and suggest actions based on that information.
+  - A fancier version would:
+    - conduct portfolio analysis to measure asset distribution, diversification, historical performance
+    - include more comprehensive "opportunity detectors" such as idle balance, gas optimization, etc
+    - learn user preferences over time (tokens, risk tolerance, period, etc)
+    - have a feedback loop to track which recommendations are acted upon
 
 ## License
 

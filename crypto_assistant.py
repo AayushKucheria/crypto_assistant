@@ -33,12 +33,12 @@ HELP_TEXT = """
     2. Bridge 50 ETH from Ethereum to Arbitrum using Across"""
 
 # System message for the AI
-SYSTEM_MESSAGE = """
-You are a helpful assistant for crypto operations. 
+SYSTEM_MESSAGE = f"""
+You are a helpful assistant for crypto operations. Your role is to interpret user requests and call the appropriate function (swap or bridge) with the correct parameters.
 
 {HELP_TEXT}
 
-If the user asks for unsupported actions or provides unclear inputs, guide them towards these supported operations.
+If the user asks for unsupported actions or provides unclear inputs, guide them towards these supported operations. Always try to interpret the user's intent and call the appropriate function, even if their phrasing is not exact.
 """
 
 # Define the tools for swap and bridge actions
@@ -79,6 +79,17 @@ tools = [
     }
 ]
 
+def generate_error_message(error_type: str, value: str) -> str:
+    """Generate an informative error message based on the type of error."""
+    if error_type == 'action':
+        return f"I'm sorry, but the '{value}' action is not supported. Currently, I can help with {', '.join(SUPPORTED_ACTIONS)} operations. Would you like to try one of these?"
+    elif error_type == 'protocol':
+        return f"I apologize, but {value} is not a supported protocol. Currently, I can work with {', '.join(SUPPORTED_PROTOCOLS)}. Would you like to use one of these instead?"
+    elif error_type == 'chain':
+        return f"I'm sorry, but {value} is not a supported blockchain. Currently, I can work with {', '.join(SUPPORTED_CHAINS)}. Would you like to try with one of these chains?"
+    else:
+        return "I couldn't understand your request. Could you please rephrase it in terms of swapping or bridging tokens?"
+
 def validate_amount(amount_str: str) -> tuple[bool, str]:
     """Validate the token amount."""
     try:
@@ -93,17 +104,7 @@ def validate_amount(amount_str: str) -> tuple[bool, str]:
     except InvalidOperation:
         return False, "Invalid amount. Please enter a valid number."
 
-def generate_error_message(error_type: str, value: str) -> str:
-    """Generate an informative error message based on the type of error."""
-    if error_type == 'action':
-        return f"I'm sorry, but the '{value}' action is not supported. Currently, I can help with {', '.join(SUPPORTED_ACTIONS)} operations. Would you like to try one of these?"
-    elif error_type == 'protocol':
-        return f"I apologize, but {value} is not a supported protocol. Currently, I can work with {', '.join(SUPPORTED_PROTOCOLS)}. Would you like to use one of these instead?"
-    elif error_type == 'chain':
-        return f"I'm sorry, but {value} is not a supported blockchain. Currently, I can work with {', '.join(SUPPORTED_CHAINS)}. Would you like to try with one of these chains?"
-    else:
-        return "I couldn't understand your request. Could you please rephrase it in terms of swapping or bridging tokens?"
-    
+
 def validate_swap(function_args: dict) -> tuple[bool, str]:
     """Validate swap operation arguments."""
     if function_args.get('protocol', '').lower() not in SUPPORTED_PROTOCOLS:
@@ -122,19 +123,6 @@ def validate_bridge(function_args: dict) -> tuple[bool, str]:
     if not is_valid:
         return False, f"Invalid amount for bridging: {amount_message}"
     return True, amount_message
-    
-def get_ai_response(input_text: str) -> openai.types.chat.ChatCompletion:
-    """Get AI response for the given input."""
-    messages = [
-        {"role": "system", "content": SYSTEM_MESSAGE},
-        {"role": "user", "content": input_text}
-    ]
-    return client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=messages,
-        tools=tools,
-        tool_choice="auto"
-    )
 
 def validate_command(function_name: str, function_args: dict) -> tuple[bool, str]:
     """Validate the command based on the function name."""
@@ -163,10 +151,21 @@ def process_bridge(function_args: dict) -> dict:
         "params": function_args
     }
 
+def get_ai_response(input_text: str) -> openai.types.chat.ChatCompletion:
+    """Get AI response for the given input."""
+    messages = [
+        {"role": "system", "content": SYSTEM_MESSAGE},
+        {"role": "user", "content": input_text}
+    ]
+    return client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=messages,
+        tools=tools,
+        tool_choice="auto"
+    )
+
 def process_ai_response(response: openai.types.chat.ChatCompletion) -> tuple[dict | None, str]:
     """Process the AI response and return structured output or guidance."""
-
-    # print(response.choices[0].message)
 
     if not response.choices[0].message.tool_calls:
         # Return the AI's message content if there are no tool calls
@@ -192,7 +191,6 @@ def process_ai_response(response: openai.types.chat.ChatCompletion) -> tuple[dic
 
     return result, "Operation processed successfully."
         
-
 def process_nl_input(input_text: str) -> tuple[dict | None, str | None]:
     """Process natural language input and return structured output or guidance."""
 
